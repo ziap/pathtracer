@@ -63,7 +63,6 @@ void ray_reflect(inout ray_t ray, inout uint state) {
 
 uint get_seed() {
   uint state = uint(gl_FragCoord.x + u_resolution.x * gl_FragCoord.y);
-  return state;
   rand(state);
   return state + uint(u_time * 1000.0f);
 }
@@ -144,16 +143,21 @@ vec3 sky_gradient(ray_t ray) {
 // TODO: Generate this function with scene information in the CPU
 void cast_ray(inout ray_t ray) {
   material_t red = material_t(vec4(1.0, 0.0, 0.0, 1.0));
-  material_t black = material_t(vec4(0.0, 0.0, 0.0, 1.0));
+  material_t green = material_t(vec4(0.0, 1.0, 0.0, 1.0));
   material_t blue = material_t(vec4(0.0, 0.0, 1.0, 1.0));
+  material_t black = material_t(vec4(0.0, 0.0, 0.0, 1.0));
 
-  sphere_t sphere1 = sphere_t(vec3(3.0, 1.0, 3.0), 1.0, red);
-  sphere_t sphere2 = sphere_t(vec3(0.0, 1.0, 3.0), 1.0, black);
-  sphere_t sphere3 = sphere_t(vec3(-3.0, 1.0, 3.0), 1.0, blue);
+  intersect_sphere(ray, sphere_t(vec3(3.0, 1.0, 3.0), 1.0, red));
+  intersect_sphere(ray, sphere_t(vec3(0.0, 1.0, 3.0), 1.0, green));
+  intersect_sphere(ray, sphere_t(vec3(-3.0, 1.0, 3.0), 1.0, blue));
 
-  intersect_sphere(ray, sphere1);
-  intersect_sphere(ray, sphere2);
-  intersect_sphere(ray, sphere3);
+  intersect_sphere(ray, sphere_t(vec3(3.0, 1.0, 6.0), 1.0, green));
+  intersect_sphere(ray, sphere_t(vec3(0.0, 1.0, 6.0), 1.0, black));
+  intersect_sphere(ray, sphere_t(vec3(-3.0, 1.0, 6.0), 1.0, red));
+
+  intersect_sphere(ray, sphere_t(vec3(3.0, 1.0, 9.0), 1.0, blue));
+  intersect_sphere(ray, sphere_t(vec3(0.0, 1.0, 9.0), 1.0, red));
+  intersect_sphere(ray, sphere_t(vec3(-3.0, 1.0, 9.0), 1.0, black));
 
   intersect_environment(ray);
 }
