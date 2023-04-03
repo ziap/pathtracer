@@ -21,6 +21,7 @@ struct ray_t {
   vec3 dir;
   float length;
   material_t hit_mat;
+  vec3 hit_normal;
 };
 
 struct sphere_t {
@@ -59,25 +60,30 @@ void intersect_sphere(inout ray_t ray, sphere_t sphere) {
   float c = dot(va, va) - sphere.radius * sphere.radius;
 
   float delta = b * b - 4.0 * a * c;
-
+  
   if (delta >= 0.0) {
     float t = (-b - sqrt(delta)) / 2.0 * a;
-    if (t >= 0.0 && (ray.length < 0.0 || ray.length > t)) {
+
+    vec3 n = normalize(va + ray.dir * t);
+
+    if (t > 0.0 && (ray.length < 0.0 || ray.length > t)) {
       ray.length = t;
       ray.hit_mat = sphere.mat;
+      ray.hit_normal = n;
     } 
   }
 }
 
 void intersect_environment(inout ray_t ray) {
   float t = -ray.origin.y / ray.dir.y;
-  if (t >= 0.0 && (ray.length < 0.0 || ray.length > t)) {
+  if (t > 0.0 && (ray.length < 0.0 || ray.length > t)) {
     ray.length = t;
     vec3 hit = ray.origin + ray.dir * ray.length;
     int tile = int(hit.x) + int(hit.z) + int(hit.x < 0.0) + int(hit.z < 0.0);
 
     if (tile % 2 == 0) ray.hit_mat.color = vec4(0.8, 0.8, 0.8, 1.0);
     else ray.hit_mat.color = vec4(0.6, 0.6, 0.6, 1.0);
+    ray.hit_normal = vec3(0.0, 1.0, 0.0);
   }
 }
 
