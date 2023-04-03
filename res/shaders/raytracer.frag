@@ -4,7 +4,7 @@
 precision highp float;
 #endif
 
-#define FOV 45.0
+#define FOV 70.0
 
 uniform vec2 u_resolution;
 uniform vec2 u_angle;
