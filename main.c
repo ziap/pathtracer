@@ -26,6 +26,23 @@ void cursor_callback(GLFWwindow *window, double xpos, double ypos) {
   update_mouse(xpos, ypos);
 }
 
+void key_callback(
+  GLFWwindow *window, int key, int scancode, int action, int mods
+) {
+  (void)window;
+  (void)scancode;
+  (void)mods;
+  if (key > 256) return;
+  if (action == GLFW_PRESS) {
+    key_pressed(key);
+    return;
+  }
+  if (action == GLFW_RELEASE) {
+    key_released(key);
+    return;
+  }
+}
+
 int glCreateBuffer(void) {
   GLuint buf;
   glCreateBuffers(1, &buf);
@@ -88,6 +105,7 @@ int main(void) {
 
   glfwSetFramebufferSizeCallback(window, resize_callback);
   glfwSetCursorPosCallback(window, cursor_callback);
+  glfwSetKeyCallback(window, key_callback);
 
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 

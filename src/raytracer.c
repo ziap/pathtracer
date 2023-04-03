@@ -13,7 +13,17 @@ void RayTracerInit(RayTracer *rb) {
 
   rb->u_resolution = glGetUniformLocation(rb->program, "u_resolution");
   rb->u_angle = glGetUniformLocation(rb->program, "u_angle");
-  rb->u_time = glGetUniformLocation(rb->program, "u_time");
+  rb->u_origin = glGetUniformLocation(rb->program, "u_origin");
+
+  rb->last_mouse_x = 0;
+  rb->last_mouse_y = 0;
+
+  rb->angle_x = 0;
+  rb->angle_y = 0;
+
+  rb->pos_x = 0;
+  rb->pos_y = 1;
+  rb->pos_z = 0;
 }
 
 void RayTracerUse(RayTracer *rb) {
@@ -22,7 +32,8 @@ void RayTracerUse(RayTracer *rb) {
 }
 
 void RayTracerUpdate(
-  RayTracer *rb, int width, int height, float mouse_x, float mouse_y, float time
+  RayTracer *rb, int width, int height, float mouse_x, float mouse_y,
+  int input_x, int input_y, float dt
 ) {
   float dx = mouse_x - rb->last_mouse_x;
   float dy = mouse_y - rb->last_mouse_y;
@@ -39,9 +50,24 @@ void RayTracerUpdate(
   rb->last_mouse_x = mouse_x;
   rb->last_mouse_y = mouse_y;
 
+  float vxz = fcos(rb->angle_y);
+
+  float vy = fsin(rb->angle_y) * input_y;
+  float vxf = vxz * fsin(rb->angle_x) * input_y;
+  float vzf = vxz * fcos(rb->angle_x) * input_y;
+
+  float vxr = fcos(rb->angle_x) * input_x;
+  float vzr = -fsin(rb->angle_x) * input_x;
+
+  float speed = 5 / (input_x != 0 && input_y != 0 ? sqrtf(2) : 1);
+
+  rb->pos_x += (vxf + vxr) * speed * dt;
+  rb->pos_z += (vzf + vzr) * speed * dt;
+  rb->pos_y += vy * speed * dt;
+
   glUniform2f(rb->u_resolution, width, height);
   glUniform2f(rb->u_angle, rb->angle_x, rb->angle_y);
-  glUniform1f(rb->u_time, time);
+  glUniform3f(rb->u_origin, rb->pos_x, rb->pos_y, rb->pos_z);
 }
 
 void RayTracerRender(RayTracer *rb) {

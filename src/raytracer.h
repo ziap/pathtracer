@@ -4,7 +4,7 @@
 typedef struct {
   int u_resolution;
   int u_angle;
-  int u_time;
+  int u_origin;
 
   int program;
 
@@ -15,10 +15,16 @@ typedef struct {
 
   float last_mouse_x;
   float last_mouse_y;
+
+  float pos_x;
+  float pos_y;
+  float pos_z;
 } RayTracer;
 
 extern void RayTracerInit(RayTracer*);
-extern void RayTracerUpdate(RayTracer*, int, int, float, float, float);
+extern void RayTracerUpdate(
+  RayTracer*, int, int, float, float, int, int, float
+);
 extern void RayTracerUse(RayTracer*);
 extern void RayTracerRender(RayTracer*);
 

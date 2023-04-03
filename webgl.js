@@ -17,9 +17,9 @@ function cstr(ptr) {
 let gl_objs = []
 
 const env = {
-  puts(str) {
-    console.log(cstr(str))
-  },
+  fcos(x) { return Math.cos(x) },
+  fsin(x) { return Math.sin(x) },
+  puts(str) { console.log(cstr(str)) },
   glCreateBuffer() {
     const buffer = gl.createBuffer()
     gl_objs.push(buffer)
@@ -102,6 +102,9 @@ const env = {
     const slice = new Uint8Array(memory_buffer, data, size)
     gl.bufferSubData(target, offset, slice)
   },
+  glUniform3f(location, x, y, z) {
+    gl.uniform3f(gl_objs[location], x, y, z)
+  },
   glUniform2f(location, x, y) {
     gl.uniform2f(gl_objs[location], x, y)
   },
@@ -127,12 +130,37 @@ function resize() {
   exports.resize(innerWidth, innerHeight)
 }
 
-function mousemove(e) {
-  exports.update_mouse(e.clientX, e.clientY)
-}
-
 addEventListener('resize', resize)
-addEventListener('mousemove', mousemove)
+
+let mouse_x = 0, mouse_y = 0
+let is_dragging = false
+document.addEventListener("mousedown", () => is_dragging = true)
+document.addEventListener("mouseup", () => is_dragging = false)
+
+document.addEventListener("mousemove", (e) => {
+  if (!is_dragging) return;
+  mouse_x += e.movementX
+  mouse_y += e.movementY
+
+  exports.update_mouse(mouse_x, mouse_y)
+});
+
+document.addEventListener("keydown", (e) => {
+  const ch = e.key.toUpperCase()
+  if (ch.length == 1) {
+    exports.key_pressed(ch.charCodeAt(0))
+  }
+})
+
+document.addEventListener("keyup", (e) => {
+  const ch = e.key.toUpperCase()
+  if (ch.length == 1) {
+    exports.key_released(ch.charCodeAt(0))
+  }
+})
+
+exports.update_mouse(mouse_x, mouse_y)
+
 resize()
 
 let last = null

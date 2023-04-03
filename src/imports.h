@@ -4,6 +4,8 @@
 #define NULL (const void*)0
 #define offsetof(t, d) __builtin_offsetof(t, d)
 #define sqrtf(x) __builtin_sqrtf(x)
+#define max(a, b) (a > b ? a : b)
+#define min(a, b) (a < b ? a : b)
 
 #define GL_DEPTH_TEST 0x0B71
 #define GL_FLOAT 0x1406
@@ -44,9 +46,13 @@ extern void glBufferData(int, int, const void*, int);
 extern void glVertexAttribPointer(int, int, int, bool, int, const void*);
 extern void glClear(int);
 extern void glBufferSubData(int, int, int, void*);
+extern void glUniform3f(int, float, float, float);
 extern void glUniform2f(int, float, float);
 extern void glUniform1f(int, float);
 extern void glUniform1i(int, int);
 extern void glDrawArrays(int, int, int);
+
+extern float fsin(float);
+extern float fcos(float);
 
 #endif
