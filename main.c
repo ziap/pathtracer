@@ -12,7 +12,6 @@
 
 #define TITLE "Example"
 
-float frand(void) { return (float)rand() / (float)RAND_MAX; }
 float fsin(float x) { return sin(x); }
 float fcos(float x) { return cos(x); }
 

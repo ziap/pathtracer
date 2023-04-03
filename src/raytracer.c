@@ -14,6 +14,7 @@ void RayTracerInit(RayTracer *rb) {
   rb->u_resolution = glGetUniformLocation(rb->program, "u_resolution");
   rb->u_angle = glGetUniformLocation(rb->program, "u_angle");
   rb->u_origin = glGetUniformLocation(rb->program, "u_origin");
+  rb->u_time = glGetUniformLocation(rb->program, "u_time");
 
   rb->last_mouse_x = 0;
   rb->last_mouse_y = 0;
@@ -24,6 +25,8 @@ void RayTracerInit(RayTracer *rb) {
   rb->pos_x = 0;
   rb->pos_y = 1;
   rb->pos_z = 0;
+
+  rb->time = 0;
 }
 
 void RayTracerUse(RayTracer *rb) {
@@ -65,9 +68,12 @@ void RayTracerUpdate(
   rb->pos_z += (vzf + vzr) * speed * dt;
   rb->pos_y += vy * speed * dt;
 
+  rb->time += dt;
+
   glUniform2f(rb->u_resolution, width, height);
   glUniform2f(rb->u_angle, rb->angle_x, rb->angle_y);
   glUniform3f(rb->u_origin, rb->pos_x, rb->pos_y, rb->pos_z);
+  glUniform1f(rb->u_time, rb->time);
 }
 
 void RayTracerRender(RayTracer *rb) {
