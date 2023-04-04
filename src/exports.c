@@ -51,9 +51,9 @@ void key_released(char key) {
 
 static RayTracer raytracer;
 
-void game_init(void) {
+void game_init(const char* shader) {
   glEnable(GL_DEPTH_TEST);
-  RayTracerInit(&raytracer);
+  RayTracerInit(&raytracer, shader);
 }
 
 void game_update(float dt) {

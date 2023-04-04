@@ -16,10 +16,10 @@ ENTRY=main.c
 OUTPUT=app
 
 .PHONY: all build debug web clean
-all: build web
+# all: build web
 build: build/$(OUTPUT)
 debug: debug/$(OUTPUT)
-web: $(OUTPUT).wasm
+# web: $(OUTPUT).wasm
 
 build/$(OUTPUT): $(ENTRY) $(INPUTS)
 	@mkdir -p build

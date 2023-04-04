@@ -24,7 +24,7 @@ typedef struct {
   float time;
 } RayTracer;
 
-extern void RayTracerInit(RayTracer*);
+extern void RayTracerInit(RayTracer*, const char*);
 extern void RayTracerUpdate(
   RayTracer*, int, int, float, float, int, int, float
 );

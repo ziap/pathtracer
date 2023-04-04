@@ -3,7 +3,7 @@
 
 #define export __attribute__((visibility("default")))
 
-export void game_init(void);
+export void game_init(const char*);
 export void game_update(float);
 
 export void key_pressed(char);
