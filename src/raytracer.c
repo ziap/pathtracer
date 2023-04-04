@@ -7,6 +7,10 @@
 #define PI 3.1415926535897
 
 void RayTracerInit(RayTracer *rb) {
+  // TODO:
+  // - Temporarily disable WebGL support (for easier string concatenation)
+  // - Split shader into multiple files
+  // - Generate `cast_ray` function from the CPU
   rb->program = create_program(shaders_raytracer_vert, shaders_raytracer_frag);
 
   rb->vao = glCreateVertexArray();

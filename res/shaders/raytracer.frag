@@ -56,15 +56,17 @@ vec3 random_dir(inout uint state) {
 void ray_reflect(inout ray_t ray, inout uint state) {
   ray.origin = ray.origin + ray.dir * ray.length;
   ray.dir = normalize(ray.hit_normal + random_dir(state));
-  ray.length = -1.0;
 
-  ray.origin += ray.dir * 0.0001;
+  // avoid self-intersection (disabled for now)
+  // ray.origin += ray.dir / 65536.0;
+  ray.length = -1.0;
 }
 
 uint get_seed() {
   uint state = uint(gl_FragCoord.x + u_resolution.x * gl_FragCoord.y);
+  // return state; // static noise
   rand(state);
-  return state + uint(u_time * 1000.0f);
+  return state + uint(u_time * 1000.0f); // dynamic noise
 }
 
 vec3 get_ray_direction() {
@@ -121,15 +123,16 @@ void intersect_sphere(inout ray_t ray, sphere_t sphere) {
   }
 }
 
-void intersect_environment(inout ray_t ray) {
+void intersect_environment(inout ray_t ray, material_t tile1, material_t tile2) {
   float t = -ray.origin.y / ray.dir.y;
-  if (t > 0.0 && (ray.length < 0.0 || ray.length > t)) {
+  if (t > 0.0 && ray.dir.y < 0.0 && (ray.length < 0.0 || ray.length > t)) {
     ray.length = t;
     vec3 hit = ray.origin + ray.dir * ray.length;
     int tile = int(hit.x) + int(hit.z) + int(hit.x < 0.0) + int(hit.z < 0.0);
 
-    if (tile % 2 == 0) ray.hit_mat.albedo = vec4(0.5, 0.5, 0.5, 1.0);
-    else ray.hit_mat.albedo = vec4(0.3, 0.3, 0.3, 1.0);
+    // TODO: Procedural mip-mapping to reduce moire pattern
+    if (tile % 2 == 0) ray.hit_mat = tile1;
+    else ray.hit_mat = tile2;
     set_normal(ray, vec3(0.0, 1.0, 0.0));
   }
 }
@@ -159,7 +162,9 @@ void cast_ray(inout ray_t ray) {
   intersect_sphere(ray, sphere_t(vec3(0.0, 1.0, 9.0), 1.0, red));
   intersect_sphere(ray, sphere_t(vec3(-3.0, 1.0, 9.0), 1.0, black));
 
-  intersect_environment(ray);
+  material_t tile1 = material_t(vec4(0.3, 0.3, 0.3, 1.0));
+  material_t tile2 = material_t(vec4(0.5, 0.5, 0.5, 1.0));
+  intersect_environment(ray, tile1, tile2);
 }
 
 vec4 color_pixel(uint state) {
@@ -170,6 +175,7 @@ vec4 color_pixel(uint state) {
 
   vec4 color = vec4(0.0);
 
+  // TODO: Control level of diffusion with roughness
   float w = 0.5;
   float total = 0.5;
 
