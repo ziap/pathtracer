@@ -9,7 +9,6 @@ static int compile_shader(const char *src, int type) {
 
   if (!glGetShaderParameter(shader, GL_COMPILE_STATUS)) {
     puts("ERROR: Failed to compile shader");
-    puts(src);
     glDeleteShader(shader);
     return 0;
   }

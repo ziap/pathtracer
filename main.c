@@ -8,8 +8,8 @@
 #include "src/exports.h"
 #include "src/resources.h"
 
-#define WIDTH 960
-#define HEIGHT 720
+#define WIDTH 800
+#define HEIGHT 600
 
 #define TITLE "Example"
 
@@ -46,6 +46,12 @@ void key_callback(
 int glCreateBuffer(void) {
   GLuint buf;
   glCreateBuffers(1, &buf);
+  return buf;
+}
+
+int glCreateFramebuffer(void) {
+  GLuint buf;
+  glCreateFramebuffers(1, &buf);
   return buf;
 }
 

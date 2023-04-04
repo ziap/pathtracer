@@ -8,7 +8,6 @@ typedef struct {
   int u_time;
 
   int program;
-
   int vao;
 
   float angle_x;

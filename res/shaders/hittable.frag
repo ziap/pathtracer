@@ -1,3 +1,9 @@
+struct sphere_t {
+  vec3 center;
+  float radius;
+  material_t mat;
+};
+
 void hit_sphere(inout ray_t ray, sphere_t sphere) {
   vec3 va = ray.origin - sphere.center;
 

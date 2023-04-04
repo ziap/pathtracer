@@ -16,9 +16,13 @@ vec3 random_dir(inout uint state) {
   return normalize(result);
 }
 
+#define STATIC_NOISE 0
 uint get_seed() {
   uint state = uint(gl_FragCoord.x + u_resolution.x * gl_FragCoord.y);
-  // return state; // static noise
+#if STATIC_NOISE
+  return state;
+#else
   rand(state);
-  return state + uint(u_time * 1000.0f); // dynamic noise
+  return state + uint(u_time * 1000.0f);
+#endif
 }

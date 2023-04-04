@@ -25,6 +25,7 @@ typedef enum { false, true } bool;
 extern int puts(const char*);
 
 extern int glCreateBuffer(void);
+extern int glCreateFramebuffer(void);
 extern int glCreateVertexArray(void);
 extern int glCreateShader(int);
 extern int glCreateProgram(void);

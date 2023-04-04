@@ -1,3 +1,4 @@
+#define FOV 70.0
 vec3 get_ray_direction() {
   vec2 uv = gl_FragCoord.xy / u_resolution - 0.5;
 
@@ -30,11 +31,18 @@ void set_normal(inout ray_t ray, vec3 n) {
   }
 }
 
-void ray_reflect(inout ray_t ray, inout uint state) {
+void ray_diffuse(inout ray_t ray, inout uint state) {
   ray.origin = ray.origin + ray.dir * ray.length;
   ray.dir = normalize(ray.hit_normal + random_dir(state));
 
   // avoid self-intersection (disabled for now)
   // ray.origin += ray.dir / 65536.0;
+  ray.length = -1.0;
+}
+
+void ray_reflect(inout ray_t ray, inout uint state) {
+  ray.origin = ray.origin + ray.dir * ray.length;
+  vec3 reflected_dir = reflect(ray.dir, ray.hit_normal);
+  ray.dir = normalize(reflected_dir + random_dir(state) * ray.hit_mat.glossy);
   ray.length = -1.0;
 }

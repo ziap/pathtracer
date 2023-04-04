@@ -4,20 +4,20 @@
 precision highp float;
 #endif
 
-#define FOV 70.0
-#define BOUNCE_LIMIT 50
-
 uniform vec2 u_resolution;
 uniform vec2 u_angle;
 uniform vec3 u_origin;
 uniform float u_time;
+uniform float moved;
 
 out vec4 frag_color;
 
 struct material_t {
-  vec4 albedo;
+  vec3 albedo;
+  float emissive;
 
-  // TODO: Roughness, metallic, ...
+  float metallic;
+  float glossy;
 };
 
 struct ray_t {
@@ -28,10 +28,3 @@ struct ray_t {
   vec3 hit_normal;
   bool hit_front;
 };
-
-struct sphere_t {
-  vec3 center;
-  float radius;
-  material_t mat;
-};
-
