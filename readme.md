@@ -1,30 +1,33 @@
-# OpenBL
+# Path tracer
 
-OpenGL boilerplate/library/framework/engine idk something that make me code less
-and copy-paste more.
+A real-time, GPU accelerated, interactive path tracing engine written in C and OpenGL.
+
+![](render.png)
 
 ## Features
 
-By default, this template handles:
+- Geometry:
+  + [x] Floor and sky
+  + [x] Sphere
+  + [ ] Triangle
+  + [ ] AABB
+  + [ ] SDF (Ray marching)
+- Material:
+  + [x] Diffuse
+  + [x] Emissive
+  + [x] Glossy/Metallic
+  + [ ] Specular
+  + [ ] Glass
+- Features:
+  + [x] Interactive camera
+  + [x] Continuous rendering
+  + [ ] Scene loading
+  + [ ] VBH generation
+  + [ ] Adaptive sampling
+  + [ ] Depth of field
+  + [ ] Motion blur
 
-- Building
-  + Native platform using GLFW
-  + Web platform using WebAssembly and WebGL
-- Window creation and event handling
-- FPS display (Native only)
-- Compiling and loading shader
-- An example "Renderer":
-  - Uniforms:
-    + Resolution
-    + Mouse position
-    + Time
-  - Shaders:
-    + Vertex shader: Full-screen quad
-    + Fragment shader: Time-varying color gradient that follows the mouse
-
-## How to use (this is also copy-pasted)
-
-- Replace all `example` with the new project name using `grep` or something.
+## How to use
 
 ### Requirements
 
@@ -68,16 +71,6 @@ For the Linux version, the executable is located at `./build/app`
 
 For the web version use a web server (See [above](#requirements)) to host the
 website.
-
-## Todo
-
-- Better error reporting
-- Build-time shader compilation error
-- Texture loading
-- Text renderer (with SDF)
-- Ditch GLFW + GLEW for raw X11/Wayland/Win32
-- ~~Ditch Linux/Windows for a custom operating system~~
-- ~~Actually develop OpenGL software~~
 
 ## License
 

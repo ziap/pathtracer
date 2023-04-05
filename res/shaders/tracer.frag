@@ -10,19 +10,23 @@ void cast_ray(inout ray_t ray) {
   material_t red = material_t(vec3(0.8, 0.0, 0.0), 0.0, 0.0, 0.0);
   material_t green = material_t(vec3(0.0, 0.8, 0.0), 0.0, 0.0, 0.0);
   material_t blue = material_t(vec3(0.0, 0.0, 0.8), 0.0, 0.0, 0.0);
+  material_t yellow = material_t(vec3(0.8, 0.8, 0.0), 0.0, 0.0, 0.0);
+  material_t cyan = material_t(vec3(0.0, 0.8, 0.8), 0.0, 0.0, 0.0);
 
-  hit_sphere(ray, sphere_t(vec3(3.0, 1.0, 0.0), 1.0, red));
-  hit_sphere(ray, sphere_t(vec3(0.0, 1.0, 0.0), 1.0, green));
-  hit_sphere(ray, sphere_t(vec3(-3.0, 1.0, 0.0), 1.0, blue));
-  
+  material_t mirror0 = material_t(vec3(0.0, 0.0, 0.0), 0.0, 1.0, 0.0);
+  material_t mirror1 = material_t(vec3(0.0, 0.0, 0.0), 0.0, 1.0, 0.1);
 
-  material_t mirror1 = material_t(vec3(0.0, 0.0, 0.0), 0.0, 1.0, 0.0);
-  material_t mirror2 = material_t(vec3(0.0, 0.0, 0.0), 0.0, 1.0, 0.5);
-  material_t mirror3 = material_t(vec3(0.0, 0.0, 0.0), 0.0, 1.0, 1.0);
+  material_t light = material_t(vec3(0.0, 0.0, 0.0), 10.0, 0.0, 0.0);
 
-  hit_sphere(ray, sphere_t(vec3(3.0, 1.0, 6.0), 1.0, mirror1));
-  hit_sphere(ray, sphere_t(vec3(0.0, 1.0, 6.0), 1.0, mirror2));
-  hit_sphere(ray, sphere_t(vec3(-3.0, 1.0, 6.0), 1.0, mirror3));
+  hit_sphere(ray, sphere_t(vec3(-6.0, 1.0, 4.0), 1.0, red));
+  hit_sphere(ray, sphere_t(vec3(-3.0, 1.0, 3.0), 1.0, green));
+  hit_sphere(ray, sphere_t(vec3(0.0, 1.0, 2.0), 1.0, blue));
+  hit_sphere(ray, sphere_t(vec3(3.0, 1.0, 3.0), 1.0, yellow));
+  hit_sphere(ray, sphere_t(vec3(6.0, 1.0, 4.0), 1.0, cyan));
+
+  hit_sphere(ray, sphere_t(vec3(6.0, 5.0, 12.0), 5.0, mirror0));
+  hit_sphere(ray, sphere_t(vec3(-6.0, 5.0, 12.0), 5.0, mirror1));
+  hit_sphere(ray, sphere_t(vec3(0, 8.0, 6.0), 1.0, light));
 
   material_t tile1 = material_t(vec3(0.8, 0.8, 0.8), 0.0, 0.0, 0.0);
   material_t tile2 = material_t(vec3(0.6, 0.6, 0.6), 0.0, 0.0, 0.0);
