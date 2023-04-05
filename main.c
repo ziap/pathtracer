@@ -55,6 +55,12 @@ int glCreateFramebuffer(void) {
   return buf;
 }
 
+int glCreateTexture(void) {
+  GLuint tex;
+  glCreateTextures(GL_TEXTURE_2D, 1, &tex);
+  return tex;
+}
+
 int glCreateVertexArray(void) {
   GLuint vao;
   glCreateVertexArrays(1, &vao);
@@ -88,8 +94,8 @@ void message_callback(
 
 char *generate_shader(void) {
   const char *shaders[] = {
-    shaders_header_frag,   shaders_random_frag,    shaders_ray_frag,
-    shaders_hittable_frag, shaders_raytracer_frag,
+    shaders_header_frag,   shaders_random_frag, shaders_ray_frag,
+    shaders_hittable_frag, shaders_tracer_frag,
   };
 
   size_t shader_count = sizeof(shaders) / sizeof(shaders[0]);

@@ -9,6 +9,7 @@
 
 #define GL_DEPTH_TEST 0x0B71
 #define GL_FLOAT 0x1406
+#define GL_UNSIGNED_BYTE 0x1401
 #define GL_COLOR_BUFFER_BIT 0x4000
 #define GL_DEPTH_BUFFER_BIT 0x0100
 #define GL_TRIANGLES 0x0004
@@ -16,7 +17,14 @@
 #define GL_VERTEX_SHADER 0x8B31
 #define GL_COMPILE_STATUS 0x8B81
 #define GL_ARRAY_BUFFER 0x8892
+#define GL_FRAMEBUFFER 0x8D40
+#define GL_TEXTURE_2D 0x0DE1
+#define GL_TEXTURE_MAG_FILTER 0x2800
+#define GL_TEXTURE_MIN_FILTER 0x2801
+#define GL_RGB 0x1907
+#define GL_NEAREST 0x2600
 #define GL_DYNAMIC_DRAW 0x88E8
+#define GL_COLOR_ATTACHMENT0 0x8CE0
 
 #ifndef __cplusplus
 typedef enum { false, true } bool;
@@ -26,6 +34,7 @@ extern int puts(const char*);
 
 extern int glCreateBuffer(void);
 extern int glCreateFramebuffer(void);
+extern int glCreateTexture(void);
 extern int glCreateVertexArray(void);
 extern int glCreateShader(int);
 extern int glCreateProgram(void);
@@ -41,7 +50,13 @@ extern void glValidateProgram(int);
 extern void glEnable(int);
 extern void glUseProgram(int);
 extern void glBindBuffer(int, int);
+extern void glBindFramebuffer(int, int);
 extern void glBindVertexArray(int);
+extern void glBindTexture(int, int);
+extern void glActiveTexture(int);
+extern void glTexImage2D(int, int, int, int, int, int, int, int, int);
+extern void glTexParameteri(int, int, int);
+extern void glFramebufferTexture(int, int, int, int);
 extern void glEnableVertexAttribArray(int);
 extern void glBufferData(int, int, const void*, int);
 extern void glVertexAttribPointer(int, int, int, bool, int, const void*);

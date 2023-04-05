@@ -1,6 +1,5 @@
 #include "raytracer.h"
 
-#include "imports.h"
 #include "resources.h"
 #include "shader.h"
 
@@ -8,14 +7,16 @@
 
 void RayTracerInit(RayTracer *rb, const char *shader) {
   // TODO: Generate `cast_ray` function from the CPU
-  rb->program = create_program(shaders_raytracer_vert, shader);
+  rb->tracer_program = create_program(shaders_quad_vert, shader);
+  rb->render_program = create_program(shaders_quad_vert, shaders_render_frag);
 
   rb->vao = glCreateVertexArray();
 
-  rb->u_resolution = glGetUniformLocation(rb->program, "u_resolution");
-  rb->u_angle = glGetUniformLocation(rb->program, "u_angle");
-  rb->u_origin = glGetUniformLocation(rb->program, "u_origin");
-  rb->u_time = glGetUniformLocation(rb->program, "u_time");
+  rb->u_resolution = glGetUniformLocation(rb->tracer_program, "u_resolution");
+  rb->u_angle = glGetUniformLocation(rb->tracer_program, "u_angle");
+  rb->u_origin = glGetUniformLocation(rb->tracer_program, "u_origin");
+  rb->u_time = glGetUniformLocation(rb->tracer_program, "u_time");
+  rb->u_samples = glGetUniformLocation(rb->tracer_program, "u_samples");
 
   rb->last_mouse_x = 0;
   rb->last_mouse_y = 0;
@@ -28,11 +29,56 @@ void RayTracerInit(RayTracer *rb, const char *shader) {
   rb->pos_z = 0;
 
   rb->time = 0;
+
+  rb->moved = false;
+  rb->samples = 0;
+
+  rb->texture1 = glCreateTexture();
+  rb->texture2 = glCreateTexture();
+  rb->framebuffer = glCreateFramebuffer();
+
+  glBindTexture(GL_TEXTURE_2D, rb->texture1);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+  glBindTexture(GL_TEXTURE_2D, rb->texture2);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 }
 
-void RayTracerUse(RayTracer *rb) {
-  glUseProgram(rb->program);
+static void Render(RayTracer *rb, int width, int height) {
+  glUseProgram(rb->tracer_program);
+
+  glUniform2f(rb->u_resolution, width, height);
+  glUniform2f(rb->u_angle, rb->angle_x, rb->angle_y);
+  glUniform3f(rb->u_origin, rb->pos_x, rb->pos_y, rb->pos_z);
+  glUniform1f(rb->u_time, rb->time);
+  glUniform1i(rb->u_samples, rb->samples);
+
+  // Trace image into a texture
+  glBindFramebuffer(GL_FRAMEBUFFER, rb->framebuffer);
+  glBindTexture(GL_TEXTURE_2D, rb->texture2);
+  glTexImage2D(
+    GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0
+  );
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, rb->texture2, 0);
+
+  glBindTexture(GL_TEXTURE_2D, rb->texture1);
   glBindVertexArray(rb->vao);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  // Render texture to the screen
+  glUseProgram(rb->render_program);
+  glBindTexture(GL_TEXTURE_2D, rb->texture2);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+
+  // Swap textures
+  int tmp = rb->texture1;
+  rb->texture1 = rb->texture2;
+  rb->texture2 = tmp;
+
+  rb->samples++;
 }
 
 void RayTracerUpdate(
@@ -63,7 +109,7 @@ void RayTracerUpdate(
   float vxr = fcos(rb->angle_x) * input_x;
   float vzr = -fsin(rb->angle_x) * input_x;
 
-  float speed = 5 / (input_x != 0 && input_y != 0 ? sqrtf(2) : 1);
+  float speed = 5 / ((input_x && input_y) ? sqrtf(2) : 1);
 
   rb->pos_x += (vxf + vxr) * speed * dt;
   rb->pos_z += (vzf + vzr) * speed * dt;
@@ -71,13 +117,10 @@ void RayTracerUpdate(
 
   rb->time += dt;
 
-  glUniform2f(rb->u_resolution, width, height);
-  glUniform2f(rb->u_angle, rb->angle_x, rb->angle_y);
-  glUniform3f(rb->u_origin, rb->pos_x, rb->pos_y, rb->pos_z);
-  glUniform1f(rb->u_time, rb->time);
-}
+  if (input_x || input_y) rb->moved = true;
 
-void RayTracerRender(RayTracer *rb) {
-  (void)rb;
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  if (rb->moved) rb->samples = 0;
+  rb->moved = false;
+
+  Render(rb, width, height);
 }

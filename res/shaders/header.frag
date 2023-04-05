@@ -8,7 +8,10 @@ uniform vec2 u_resolution;
 uniform vec2 u_angle;
 uniform vec3 u_origin;
 uniform float u_time;
-uniform float moved;
+uniform int u_samples;
+
+uniform sampler2D texture;
+in vec2 tex_coord;
 
 out vec4 frag_color;
 

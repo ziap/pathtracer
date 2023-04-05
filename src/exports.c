@@ -3,10 +3,13 @@
 #include "imports.h"
 #include "raytracer.h"
 
+static RayTracer raytracer;
+
 static int width, height;
 void resize(int new_w, int new_h) {
   width = new_w;
   height = new_h;
+  raytracer.moved = true;
   glViewport(0, 0, new_w, new_h);
 }
 
@@ -14,6 +17,7 @@ static float mouse_x = 0, mouse_y = 0;
 void update_mouse(float new_x, float new_y) {
   mouse_x = new_x;
   mouse_y = height - new_y;
+  raytracer.moved = true;
 }
 
 static int input_x = 0, input_y = 0;
@@ -49,20 +53,15 @@ void key_released(char key) {
   input_y = max(input_y, -1);
 }
 
-static RayTracer raytracer;
-
 void game_init(const char* shader) {
   glEnable(GL_DEPTH_TEST);
   RayTracerInit(&raytracer, shader);
 }
 
 void game_update(float dt) {
-  RayTracerUse(&raytracer);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
   RayTracerUpdate(
     &raytracer, width, height, mouse_x, mouse_y, input_x, input_y, dt
   );
-
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  RayTracerRender(&raytracer);
 }
