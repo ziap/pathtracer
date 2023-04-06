@@ -15,7 +15,6 @@ void RayTracerInit(RayTracer *rb, const char *shader) {
   rb->u_resolution = glGetUniformLocation(rb->tracer_program, "u_resolution");
   rb->u_angle = glGetUniformLocation(rb->tracer_program, "u_angle");
   rb->u_origin = glGetUniformLocation(rb->tracer_program, "u_origin");
-  rb->u_time = glGetUniformLocation(rb->tracer_program, "u_time");
   rb->u_samples = glGetUniformLocation(rb->tracer_program, "u_samples");
 
   rb->last_mouse_x = 0;
@@ -27,8 +26,6 @@ void RayTracerInit(RayTracer *rb, const char *shader) {
   rb->pos_x = 0;
   rb->pos_y = 1;
   rb->pos_z = 0;
-
-  rb->time = 0;
 
   rb->moved = false;
   rb->samples = 0;
@@ -52,8 +49,7 @@ static void Render(RayTracer *rb, int width, int height) {
   glUniform2f(rb->u_resolution, width, height);
   glUniform2f(rb->u_angle, rb->angle_x, rb->angle_y);
   glUniform3f(rb->u_origin, rb->pos_x, rb->pos_y, rb->pos_z);
-  glUniform1f(rb->u_time, rb->time);
-  glUniform1i(rb->u_samples, rb->samples);
+  glUniform1ui(rb->u_samples, rb->samples);
 
   // Trace image into a texture
   glBindFramebuffer(GL_FRAMEBUFFER, rb->framebuffer);
@@ -114,8 +110,6 @@ void RayTracerUpdate(
   rb->pos_x += (vxf + vxr) * speed * dt;
   rb->pos_z += (vzf + vzr) * speed * dt;
   rb->pos_y += vy * speed * dt;
-
-  rb->time += dt;
 
   if (input_x || input_y) rb->moved = true;
 

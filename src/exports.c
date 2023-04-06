@@ -53,13 +53,10 @@ void key_released(char key) {
   input_y = max(input_y, -1);
 }
 
-void game_init(const char* shader) {
-  glEnable(GL_DEPTH_TEST);
-  RayTracerInit(&raytracer, shader);
-}
+void game_init(const char* shader) { RayTracerInit(&raytracer, shader); }
 
 void game_update(float dt) {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
 
   RayTracerUpdate(
     &raytracer, width, height, mouse_x, mouse_y, input_x, input_y, dt

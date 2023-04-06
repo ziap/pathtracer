@@ -1,3 +1,5 @@
+// Permuted congruential generator
+// https://www.pcg-random.org/
 float rand(inout uint state) {
 	state = state * 747796405u + 2891336453u;
 	uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
@@ -5,24 +7,33 @@ float rand(inout uint state) {
   return float(result) / float(4294967295u);
 }
 
-float normal_dist(inout uint state) {
-  float theta = radians(360.0) * rand(state);
-  float rho = sqrt(-2.0 * log(rand(state)));
-  return rho * cos(theta);
-}
-
+// Generate a vec3 with random direction and length of 1
+// To do this we can uniformly distribute a random point on the surface of a
+// sphere with radius 1
 vec3 random_dir(inout uint state) {
-  vec3 result = vec3(normal_dist(state), normal_dist(state), normal_dist(state));
-  return normalize(result);
+  // Generate a point on a cylinder with h = 2 and r = 1
+
+  // Random point on the perimeter
+  float lambda = radians(rand(state) * 360.0);
+  float x = cos(lambda);
+  float z = sin(lambda);
+
+  // Random point on the side
+  float y = rand(state) * 2.0 - 1.0;
+
+  // Project point from the cylinder to the sphere
+  // https://en.wikipedia.org/wiki/Lambert_cylindrical_equal-area_projection
+  float sin_phi = y;
+  float cos_phi = sqrt(1.0 - y * y);
+
+  return vec3(cos_phi * x, sin_phi, cos_phi * z);
 }
 
-#define STATIC_NOISE 0
 uint get_seed() {
   uint state = uint(gl_FragCoord.x + u_resolution.x * gl_FragCoord.y);
-#if STATIC_NOISE
-  return state;
-#else
+
+  // Hash the noise before adding the sample count otherwise the noise will be
+  // shifted instead of randomly change over time
   rand(state);
-  return state + uint(u_time * 1000.0f);
-#endif
+  return state + u_samples;
 }

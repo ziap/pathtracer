@@ -2,6 +2,7 @@ vec3 environment_color(ray_t ray) {
   float t = 0.5 * (ray.dir.y + 1.0);
   vec3 sky_gradient = mix(vec3(1.0), vec3(0.5, 0.7, 1.0), t);
 
+  // TODO: Atmosphere rendering (try to replicate <https://www.shadertoy.com/view/4dSBDt>)
   return sky_gradient;
 }
 
@@ -66,5 +67,6 @@ vec4 color_pixel(uint state) {
 
 void main() {
   uint state = get_seed();
-  frag_color = (texture2D(texture, tex_coord) * float(u_samples) + color_pixel(state)) / float(u_samples + 1);
+  vec4 accumulated = texture2D(texture, tex_coord) * float(u_samples);
+  frag_color = (accumulated + color_pixel(state)) / float(u_samples + 1u);
 }

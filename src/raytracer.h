@@ -7,7 +7,6 @@ typedef struct {
   int u_resolution;
   int u_angle;
   int u_origin;
-  int u_time;
   int u_samples;
 
   int tracer_program;
@@ -24,10 +23,8 @@ typedef struct {
   float pos_y;
   float pos_z;
 
-  float time;
-
   bool moved;
-  int samples;
+  unsigned int samples;
 
   int texture1;
   int texture2;
