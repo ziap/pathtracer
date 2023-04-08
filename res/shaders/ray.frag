@@ -1,5 +1,5 @@
 vec2 get_pixel(inout uint state) {
-  return gl_FragCoord.xy + (vec2(rand(state), rand(state)) - 0.5) * 1.0;
+  return gl_FragCoord.xy + (vec2(rand(state), rand(state)) - 0.5);
 }
 
 #define FOV 70.0
@@ -44,9 +44,9 @@ void ray_diffuse(inout ray_t ray, inout uint state) {
   ray.length = -1.0;
 }
 
-void ray_reflect(inout ray_t ray, inout uint state) {
+void ray_reflect(inout ray_t ray, float glossy, inout uint state) {
   ray.origin = ray.origin + ray.dir * ray.length;
   vec3 reflected_dir = reflect(ray.dir, ray.hit_normal);
-  ray.dir = normalize(reflected_dir + random_dir(state) * ray.hit_mat.glossy);
+  ray.dir = normalize(reflected_dir + random_dir(state) * glossy);
   ray.length = -1.0;
 }

@@ -7,31 +7,53 @@ vec3 environment_color(ray_t ray) {
   return sky_gradient;
 }
 
-// TODO: Generate this function with scene information in the CPU
+#define ROWS 5
+#define COLS 5
 void cast_ray(inout ray_t ray) {
   uint state = 69u;
 
-  // TODO: Optmize this before moving scene to the CPU
-  for (int i = 0; i < 25; ++i) {
+  // TODO: Possible ways to optmize:
+  // - Store id instead of material in ray hit information and use lookup table
+  // - Better intersection function
+  // 
+  // Or maybe it's just that my integrated GPU is too slow for this and the only
+  // way to optimize is to move the scene to the CPU and use VBH. But I have to
+  // optimize things as much as possible before trying to transfer data between
+  // the CPU and the GPU
+  for (int i = 0; i < ROWS * COLS; ++i) {
     float r = rand(state) + 1.0;
 
-    material_t mat;
-    if (rand(state) < 0.2) {
-      mat = material_t(vec3(0.0), 2.0, 0.0, 0.0);
-    } else {
-      vec3 color = vec3(rand(state), rand(state), rand(state));
-      mat = material_t(color, 0.0, rand(state) * 0.3, round(rand(state)) * 0.1);
-    }
-    hit_sphere(ray, sphere_t(vec3(float(i / 5) * 5.0, r, float(i % 5) * 5.0), r, mat));
+    hit_sphere(ray, sphere_t(vec3(float(i / COLS) * 5.0, r, float(i % COLS) * 5.0), r, i));
   }
-
-  material_t tile1 = material_t(vec3(0.8, 0.8, 0.8), 0.0, 0.0, 0.0);
-  material_t tile2 = material_t(vec3(0.6, 0.6, 0.6), 0.0, 0.0, 0.0);
-  hit_floor(ray, tile1, tile2);
+  hit_floor(ray);
 }
 
-#define BOUNCE_LIMIT 10
+// TODO: Also generate this function from the CPU
+material_t[ROWS * COLS] get_materials() {
+  uint state = 42u;
+
+  material_t materials[ROWS * COLS];
+  for (int i = 0; i < ROWS * COLS; ++i) {
+    if (rand(state) < 0.2) {
+      materials[i] = material_t(vec3(0.0), 2.0, 0.0, 0.0);
+    } else {
+      vec3 color = vec3(rand(state), rand(state), rand(state));
+      materials[i] = material_t(color, 0.0, rand(state) * 0.3, round(rand(state)) * 0.1);
+    }
+  }
+
+  return materials;
+}
+
+#define BOUNCE_LIMIT 8
 vec4 color_pixel(uint state) {
+  material_t tile_mats[2] = material_t[2](
+    material_t(vec3(0.8, 0.8, 0.8), 0.0, 0.1, 0.0),
+    material_t(vec3(0.6, 0.6, 0.6), 0.0, 0.1, 0.0)
+  );
+
+  material_t materials[ROWS * COLS] = get_materials();
+
   ray_t ray;
   ray.origin = u_origin;
   ray.dir = get_ray_direction(state);
@@ -44,15 +66,34 @@ vec4 color_pixel(uint state) {
     cast_ray(ray);
 
     if (ray.length > 0.0) {
-      if (rand(state) > ray.hit_mat.metallic) {
-        color += ray.hit_mat.emissive * ray_color;
-        ray_color *= ray.hit_mat.albedo;
+      material_t hit_mat;
+      if (ray.hit_id < 0) {
+        hit_mat = tile_mats[ray.hit_id + 2]; 
+      } else {
+        hit_mat = materials[ray.hit_id]; 
+      }
+
+      if (rand(state) > hit_mat.metallic) {
+        color += hit_mat.emissive * ray_color;
+        
+        // Absorb light from the ray
+        ray_color *= hit_mat.albedo;
+        
+        // Russian-roulette early stopping
+        // Dark rays can't be absorbed as much as light rays so they have a
+        // higher change of being terminated earlier
+        float threshold = clamp(max(ray_color.r, ray_color.g), ray_color.b, 1.0);
+        if (rand(state) > threshold) break;
+
+        // Adjust the value to make up for other paths being terminated
+        ray_color /= threshold;
+
         ray_diffuse(ray, state);
       } else {
-        ray_reflect(ray, state);
+        // For now the specular color is white (reflect all light)
+        ray_reflect(ray, hit_mat.glossy, state);
       }
-    }
-    else {
+    } else {
       color += ray_color * environment_color(ray);
       break;
     }

@@ -1,9 +1,9 @@
 // Permuted congruential generator
 // https://www.pcg-random.org
 uint rand_u32(inout uint state) {
-	state = state * 747796405u + 2891336453u;
-	uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
-	return (word >> 22u) ^ word;
+  state = state * 747796405u + 2891336453u;
+  uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+  return (word >> 22u) ^ word;
 }
 
 // Return float in the range [0, 1)

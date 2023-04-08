@@ -26,7 +26,7 @@ struct ray_t {
   vec3 origin;
   vec3 dir;
   float length;
-  material_t hit_mat;
+  int hit_id;
   vec3 hit_normal;
   bool hit_front;
 };

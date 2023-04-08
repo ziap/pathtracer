@@ -1,7 +1,7 @@
 struct sphere_t {
   vec3 center;
   float radius;
-  material_t mat;
+  int id;
 };
 
 void hit_sphere(inout ray_t ray, sphere_t sphere) {
@@ -31,13 +31,13 @@ void hit_sphere(inout ray_t ray, sphere_t sphere) {
 
     if (t > 0.0 && (ray.length < 0.0 || ray.length > t)) {
       ray.length = t;
-      ray.hit_mat = sphere.mat;
+      ray.hit_id = sphere.id;
       set_normal(ray, n);
     } 
   }
 }
 
-void hit_floor(inout ray_t ray, material_t tile1, material_t tile2) {
+void hit_floor(inout ray_t ray) {
   // Plane equation: ((ro + rd*t) * n) - d = 0
   // Floor normal: n = (0, 1, 0)
   // Floor distance to origin: d = 0
@@ -54,8 +54,8 @@ void hit_floor(inout ray_t ray, material_t tile1, material_t tile2) {
     int tile = int(hit.x) + int(hit.z) + int(hit.x < 0.0) + int(hit.z < 0.0);
 
     // TODO: Procedural mip-mapping to reduce moire pattern
-    if (tile % 2 == 0) ray.hit_mat = tile1;
-    else ray.hit_mat = tile2;
+    if (tile % 2 == 0) ray.hit_id = -1;
+    else ray.hit_id = -2;
     set_normal(ray, vec3(0.0, 1.0, 0.0));
   }
 }
