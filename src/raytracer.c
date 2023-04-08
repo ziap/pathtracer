@@ -66,7 +66,6 @@ static void Render(RayTracer *rb, int width, int height) {
   glBindFramebuffer(GL_FRAMEBUFFER, rb->framebuffer);
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, rb->texture2, 0);
 
-  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, rb->texture1);
   glBindVertexArray(rb->vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -74,7 +73,6 @@ static void Render(RayTracer *rb, int width, int height) {
 
   // Render texture to the screen
   glUseProgram(rb->render_program);
-  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, rb->texture2);
   glDrawArrays(GL_TRIANGLES, 0, 6);
 

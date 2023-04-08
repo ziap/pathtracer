@@ -8,8 +8,6 @@
 #define min(a, b) (a < b ? a : b)
 
 #define GL_FLOAT 0x1406
-#define GL_UNSIGNED_BYTE 0x1401
-#define GL_COLOR_BUFFER_BIT 0x4000
 #define GL_TRIANGLES 0x0004
 #define GL_FRAGMENT_SHADER 0x8B30
 #define GL_VERTEX_SHADER 0x8B31
@@ -17,7 +15,6 @@
 #define GL_ARRAY_BUFFER 0x8892
 #define GL_FRAMEBUFFER 0x8D40
 #define GL_TEXTURE_2D 0x0DE1
-#define GL_TEXTURE0 0x84C0
 #define GL_TEXTURE_MAG_FILTER 0x2800
 #define GL_TEXTURE_MIN_FILTER 0x2801
 #define GL_RGB 0x1907
@@ -50,7 +47,6 @@ extern void glUseProgram(int);
 extern void glBindBuffer(int, int);
 extern void glBindFramebuffer(int, int);
 extern void glBindVertexArray(int);
-extern void glActiveTexture(int);
 extern void glBindTexture(int, int);
 extern void glTexImage2D(int, int, int, int, int, int, int, int, int);
 extern void glTexParameteri(int, int, int);
