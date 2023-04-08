@@ -1,20 +1,23 @@
 // Permuted congruential generator
-// https://www.pcg-random.org/
-float rand(inout uint state) {
+// https://www.pcg-random.org
+uint rand_u32(inout uint state) {
 	state = state * 747796405u + 2891336453u;
 	uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
-	uint result = (word >> 22u) ^ word;
-  return float(result) / float(4294967295u);
+	return (word >> 22u) ^ word;
+}
+
+// Return float in the range [0, 1)
+float rand(inout uint state) {
+  return float(rand_u32(state)) / 4294967296.0;
 }
 
 // Generate a vec3 with random direction and length of 1
-// To do this we can uniformly distribute a random point on the surface of a
-// sphere with radius 1
+// There are many different ways to do this but this is what I went with
 vec3 random_dir(inout uint state) {
   // Generate a point on a cylinder with h = 2 and r = 1
 
   // Random point on the perimeter
-  float lambda = radians(rand(state) * 360.0);
+  float lambda = radians(float(rand_u32(state) % 360u));
   float x = cos(lambda);
   float z = sin(lambda);
 
@@ -22,7 +25,7 @@ vec3 random_dir(inout uint state) {
   float y = rand(state) * 2.0 - 1.0;
 
   // Project point from the cylinder to the sphere
-  // https://en.wikipedia.org/wiki/Lambert_cylindrical_equal-area_projection
+  // https://en.wikipedia.org/wiki/Cylindrical_equal-area_projection
   float sin_phi = y;
   float cos_phi = sqrt(1.0 - y * y);
 
@@ -34,6 +37,5 @@ uint get_seed() {
 
   // Hash the noise before adding the sample count otherwise the noise will be
   // shifted instead of randomly change over time
-  rand(state);
-  return state + u_samples;
+  return rand_u32(state) + u_samples;
 }

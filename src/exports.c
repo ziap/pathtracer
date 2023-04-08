@@ -56,8 +56,6 @@ void key_released(char key) {
 void game_init(const char* shader) { RayTracerInit(&raytracer, shader); }
 
 void game_update(float dt) {
-  glClear(GL_COLOR_BUFFER_BIT);
-
   RayTracerUpdate(
     &raytracer, width, height, mouse_x, mouse_y, input_x, input_y, dt
   );

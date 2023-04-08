@@ -17,9 +17,11 @@
 #define GL_ARRAY_BUFFER 0x8892
 #define GL_FRAMEBUFFER 0x8D40
 #define GL_TEXTURE_2D 0x0DE1
+#define GL_TEXTURE0 0x84C0
 #define GL_TEXTURE_MAG_FILTER 0x2800
 #define GL_TEXTURE_MIN_FILTER 0x2801
 #define GL_RGB 0x1907
+#define GL_RGB32F 0x8815
 #define GL_NEAREST 0x2600
 #define GL_COLOR_ATTACHMENT0 0x8CE0
 
@@ -48,14 +50,15 @@ extern void glUseProgram(int);
 extern void glBindBuffer(int, int);
 extern void glBindFramebuffer(int, int);
 extern void glBindVertexArray(int);
+extern void glActiveTexture(int);
 extern void glBindTexture(int, int);
 extern void glTexImage2D(int, int, int, int, int, int, int, int, int);
 extern void glTexParameteri(int, int, int);
 extern void glFramebufferTexture(int, int, int, int);
-extern void glClear(int);
 extern void glUniform3f(int, float, float, float);
 extern void glUniform2f(int, float, float);
 extern void glUniform1ui(int, unsigned int);
+extern void glUniform1i(int, int);
 extern void glDrawArrays(int, int, int);
 
 extern float fsin(float);

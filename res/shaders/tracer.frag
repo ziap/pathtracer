@@ -2,32 +2,22 @@ vec3 environment_color(ray_t ray) {
   float t = 0.5 * (ray.dir.y + 1.0);
   vec3 sky_gradient = mix(vec3(1.0), vec3(0.5, 0.7, 1.0), t);
 
-  // TODO: Atmosphere rendering (try to replicate <https://www.shadertoy.com/view/4dSBDt>)
+  // TODO: Atmosphere rendering
+  // Try to replicate https://www.shadertoy.com/view/4dSBDt
   return sky_gradient;
 }
 
 // TODO: Generate this function with scene information in the CPU
 void cast_ray(inout ray_t ray) {
-  material_t red = material_t(vec3(0.8, 0.0, 0.0), 0.0, 0.0, 0.0);
-  material_t green = material_t(vec3(0.0, 0.8, 0.0), 0.0, 0.0, 0.0);
-  material_t blue = material_t(vec3(0.0, 0.0, 0.8), 0.0, 0.0, 0.0);
-  material_t yellow = material_t(vec3(0.8, 0.8, 0.0), 0.0, 0.0, 0.0);
-  material_t cyan = material_t(vec3(0.0, 0.8, 0.8), 0.0, 0.0, 0.0);
+  uint state = 69u;
 
-  material_t mirror0 = material_t(vec3(0.0, 0.0, 0.0), 0.0, 1.0, 0.0);
-  material_t mirror1 = material_t(vec3(0.0, 0.0, 0.0), 0.0, 1.0, 0.1);
-
-  material_t light = material_t(vec3(0.0, 0.0, 0.0), 10.0, 0.0, 0.0);
-
-  hit_sphere(ray, sphere_t(vec3(-6.0, 1.0, 4.0), 1.0, red));
-  hit_sphere(ray, sphere_t(vec3(-3.0, 1.0, 3.0), 1.0, green));
-  hit_sphere(ray, sphere_t(vec3(0.0, 1.0, 2.0), 1.0, blue));
-  hit_sphere(ray, sphere_t(vec3(3.0, 1.0, 3.0), 1.0, yellow));
-  hit_sphere(ray, sphere_t(vec3(6.0, 1.0, 4.0), 1.0, cyan));
-
-  hit_sphere(ray, sphere_t(vec3(6.0, 5.0, 12.0), 5.0, mirror0));
-  hit_sphere(ray, sphere_t(vec3(-6.0, 5.0, 12.0), 5.0, mirror1));
-  hit_sphere(ray, sphere_t(vec3(0, 8.0, 6.0), 1.0, light));
+  // TODO: Optmize this before moving scene to the CPU
+  for (int i = 0; i < 25; ++i) {
+    float r = rand(state) + 1.0;
+    vec3 color = vec3(rand(state), rand(state), rand(state));
+    material_t mat = material_t(color, 0.0, float(rand(state) < 0.3), round(rand(state)) * 0.1);
+    hit_sphere(ray, sphere_t(vec3(float(i / 5) * 5.0, r, float(i % 5) * 5.0), r, mat));
+  }
 
   material_t tile1 = material_t(vec3(0.8, 0.8, 0.8), 0.0, 0.0, 0.0);
   material_t tile2 = material_t(vec3(0.6, 0.6, 0.6), 0.0, 0.0, 0.0);
@@ -38,7 +28,7 @@ void cast_ray(inout ray_t ray) {
 vec4 color_pixel(uint state) {
   ray_t ray;
   ray.origin = u_origin;
-  ray.dir = get_ray_direction();
+  ray.dir = get_ray_direction(state);
   ray.length = -1.0;
 
   vec3 color = vec3(0.0);
@@ -67,6 +57,6 @@ vec4 color_pixel(uint state) {
 
 void main() {
   uint state = get_seed();
-  vec4 accumulated = texture2D(texture, tex_coord) * float(u_samples);
+  vec4 accumulated = texture2D(u_texture, tex_coord) * float(u_samples);
   frag_color = (accumulated + color_pixel(state)) / float(u_samples + 1u);
 }

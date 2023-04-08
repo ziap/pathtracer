@@ -4,11 +4,14 @@
 precision highp float;
 #endif
 
-uniform sampler2D texture;
+uniform sampler2D u_texture;
 in vec2 tex_coord;
 
 out vec4 frag_color;
 
 void main() {
-  frag_color = texture2D(texture, tex_coord);
+  vec3 hdr_color = texture2D(u_texture, tex_coord).rgb;
+
+  // TODO: Tone mapping
+  frag_color = vec4(clamp(hdr_color, 0.0, 1.0), 1.0);
 }

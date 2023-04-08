@@ -9,7 +9,7 @@ uniform vec2 u_angle;
 uniform vec3 u_origin;
 uniform uint u_samples;
 
-uniform sampler2D texture;
+uniform sampler2D u_texture;
 in vec2 tex_coord;
 
 out vec4 frag_color;

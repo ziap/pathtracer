@@ -1,6 +1,10 @@
+vec2 get_pixel(inout uint state) {
+  return gl_FragCoord.xy + (vec2(rand(state), rand(state)) - 0.5) * 1.0;
+}
+
 #define FOV 70.0
-vec3 get_ray_direction() {
-  vec2 uv = gl_FragCoord.xy / u_resolution - 0.5;
+vec3 get_ray_direction(inout uint state) {
+  vec2 uv = get_pixel(state) / u_resolution - 0.5;
 
   vec2 plane;
   

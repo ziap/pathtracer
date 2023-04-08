@@ -51,14 +51,22 @@ static void Render(RayTracer *rb, int width, int height) {
   glUniform3f(rb->u_origin, rb->pos_x, rb->pos_y, rb->pos_z);
   glUniform1ui(rb->u_samples, rb->samples);
 
-  // Trace image into a texture
-  glBindFramebuffer(GL_FRAMEBUFFER, rb->framebuffer);
+  // Setup textures
+  glBindTexture(GL_TEXTURE_2D, rb->texture1);
+  glTexImage2D(
+    GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, 0
+  );
+
   glBindTexture(GL_TEXTURE_2D, rb->texture2);
   glTexImage2D(
-    GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0
+    GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, 0
   );
+
+  // Trace image into a texture
+  glBindFramebuffer(GL_FRAMEBUFFER, rb->framebuffer);
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, rb->texture2, 0);
 
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, rb->texture1);
   glBindVertexArray(rb->vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -66,6 +74,7 @@ static void Render(RayTracer *rb, int width, int height) {
 
   // Render texture to the screen
   glUseProgram(rb->render_program);
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, rb->texture2);
   glDrawArrays(GL_TRIANGLES, 0, 6);
 
