@@ -14,8 +14,14 @@ void cast_ray(inout ray_t ray) {
   // TODO: Optmize this before moving scene to the CPU
   for (int i = 0; i < 25; ++i) {
     float r = rand(state) + 1.0;
-    vec3 color = vec3(rand(state), rand(state), rand(state));
-    material_t mat = material_t(color, 0.0, float(rand(state) < 0.3), round(rand(state)) * 0.1);
+
+    material_t mat;
+    if (rand(state) < 0.2) {
+      mat = material_t(vec3(0.0), 2.0, 0.0, 0.0);
+    } else {
+      vec3 color = vec3(rand(state), rand(state), rand(state));
+      mat = material_t(color, 0.0, rand(state) * 0.3, round(rand(state)) * 0.1);
+    }
     hit_sphere(ray, sphere_t(vec3(float(i / 5) * 5.0, r, float(i % 5) * 5.0), r, mat));
   }
 
