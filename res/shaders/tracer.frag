@@ -8,8 +8,8 @@ vec3 environment_color(in ray_t ray) {
 }
 
 // TODO: Generate this function from the CPU
-#define ROWS 1
-#define COLS 1
+#define ROWS 5
+#define COLS 5
 void cast_ray(inout ray_t ray) {
   uint state = 69u;
 
