@@ -1,4 +1,4 @@
-vec3 environment_color(ray_t ray) {
+vec3 environment_color(in ray_t ray) {
   float t = 0.5 * (ray.dir.y + 1.0);
   vec3 sky_gradient = mix(vec3(1.0), vec3(0.5, 0.7, 1.0), t);
 
@@ -8,8 +8,8 @@ vec3 environment_color(ray_t ray) {
 }
 
 // TODO: Generate this function from the CPU
-#define ROWS 5
-#define COLS 5
+#define ROWS 1
+#define COLS 1
 void cast_ray(inout ray_t ray) {
   uint state = 69u;
 
@@ -20,6 +20,7 @@ void cast_ray(inout ray_t ray) {
 
     hit_sphere(ray, sphere_t(vec3(x, r, z), r, i));
   }
+  // hit_sphere(ray, sphere_t(vec3(0.0, -1e6, 0.0), 1e6, -1));
   hit_floor(ray);
 }
 
@@ -38,7 +39,7 @@ material_t[ROWS * COLS] get_materials() {
   material_t materials[ROWS * COLS];
   for (int i = 0; i < ROWS * COLS; ++i) {
     if (rand(state) < 0.2) {
-      materials[i] = material_t(vec3(0.0), 2.2, 0.0, 0.0);
+      materials[i] = material_t(vec3(0.0), 2.5, 0.0, 0.0);
     } else {
       vec3 color = vec3(rand(state), rand(state), rand(state));
       float glossy = float(rand(state) < 0.5) * 0.1 * rand(state);
@@ -52,8 +53,8 @@ material_t[ROWS * COLS] get_materials() {
 #define BOUNCE_LIMIT 8
 vec4 color_pixel(uint state) {
   material_t tile_mats[2] = material_t[2](
-    material_t(vec3(0.8, 0.8, 0.8), 0.0, 0.1, 0.0),
-    material_t(vec3(0.6, 0.6, 0.6), 0.0, 0.1, 0.0)
+    material_t(vec3(0.8, 0.8, 0.8), 0.0, 0.0, 0.0),
+    material_t(vec3(0.6, 0.6, 0.6), 0.0, 0.0, 0.0)
   );
 
   material_t materials[ROWS * COLS] = get_materials();
@@ -61,7 +62,7 @@ vec4 color_pixel(uint state) {
   ray_t ray;
   ray.origin = u_origin;
   ray.dir = get_ray_direction(state);
-  ray.length = -1.0;
+  ray.length = VERY_FAR;
 
   vec3 color = vec3(0.0);
   vec3 ray_color = vec3(1.0);
@@ -69,13 +70,15 @@ vec4 color_pixel(uint state) {
   for (int i = 0; i < BOUNCE_LIMIT; ++i) {
     cast_ray(ray);
 
-    if (ray.length > 0.0) {
+    if (ray.length < VERY_FAR) {
       material_t hit_mat;
       if (ray.hit_id < 0) {
         hit_mat = tile_mats[ray.hit_id + 2]; 
       } else {
         hit_mat = materials[ray.hit_id]; 
       }
+
+      // return vec4(hit_mat.albedo, 1.0);
 
       if (rand(state) > hit_mat.metallic) {
         color += hit_mat.emissive * ray_color;

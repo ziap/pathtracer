@@ -7,11 +7,20 @@ precision highp float;
 uniform sampler2D u_texture;
 in vec2 tex_coord;
 
+vec3 ACESFilm(vec3 x) {
+  float a = 2.51f;
+  float b = 0.03f;
+  float c = 2.43f;
+  float d = 0.59f;
+  float e = 0.14f;
+  return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0f, 1.0f);
+}
+
 out vec4 frag_color;
 
 void main() {
   vec3 hdr_color = texture2D(u_texture, tex_coord).rgb;
 
   // TODO: Implement HDR rendering pipeline
-  frag_color = vec4(clamp(hdr_color, 0.0, 1.0), 1.0);
+  frag_color = vec4(ACESFilm(hdr_color), 1.0);
 }

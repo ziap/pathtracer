@@ -7,17 +7,18 @@ void hit_floor(inout ray_t ray) {
   // Solve for t:
   // ro.y + rd.y*t = 0
   // t = -ro.y / rd.y
-  float t = -ray.origin.y / ray.dir.y;
+  if (ray.dir.y >= 0.0) return;
+  float t = min(-ray.origin.y / ray.dir.y, VERY_FAR - 1.0);
 
-  if (t > 0.0 && ray.dir.y < 0.0 && (ray.length < 0.0 || ray.length > t)) {
+  if (t > 0.0 && ray.length > t) {
     ray.length = t;
     vec3 hit = ray.origin + ray.dir * ray.length;
+    ray.hit_normal = vec3(0.0, 1.0, 0.0);
+
     int tile = int(hit.x) + int(hit.z) + int(hit.x < 0.0) + int(hit.z < 0.0);
 
-    // TODO: Procedural mip-mapping to reduce moire pattern
     if (tile % 2 == 0) ray.hit_id = -1;
     else ray.hit_id = -2;
-    set_normal(ray, vec3(0.0, 1.0, 0.0));
   }
 }
 
@@ -52,10 +53,10 @@ void hit_sphere(inout ray_t ray, sphere_t sphere) {
     // ro + rd*t - center = va + rd*t
     vec3 n = normalize(va + ray.dir * t);
 
-    if (t > 0.0 && (ray.length < 0.0 || ray.length > t)) {
+    if (t > 0.0 && ray.length > t) {
       ray.length = t;
       ray.hit_id = sphere.id;
-      set_normal(ray, n);
+      ray.hit_normal = n;
     } 
   }
 }

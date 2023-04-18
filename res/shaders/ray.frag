@@ -4,7 +4,6 @@ struct ray_t {
   float length;
   int hit_id;
   vec3 hit_normal;
-  bool hit_front;
 };
 
 #define FOV 70.0
@@ -29,15 +28,7 @@ vec3 get_ray_direction(inout uint state) {
   return normalize(forward + right * coord.x + up * coord.y);
 }
 
-void set_normal(inout ray_t ray, vec3 n) {
-  if (dot(ray.dir, n) > 0.0) {
-    ray.hit_normal = -n;
-    ray.hit_front = false;
-  } else {
-    ray.hit_normal = n;
-    ray.hit_front = true;
-  }
-}
+#define VERY_FAR 1e6
 
 void ray_diffuse(inout ray_t ray, inout uint state) {
   ray.origin = ray.origin + ray.dir * ray.length;
@@ -45,12 +36,12 @@ void ray_diffuse(inout ray_t ray, inout uint state) {
 
   // avoid self-intersection (disabled for now)
   // ray.origin += ray.dir / 65536.0;
-  ray.length = -1.0;
+  ray.length = VERY_FAR;
 }
 
 void ray_reflect(inout ray_t ray, float glossy, inout uint state) {
   ray.origin = ray.origin + ray.dir * ray.length;
   vec3 reflected_dir = reflect(ray.dir, ray.hit_normal);
   ray.dir = normalize(reflected_dir + random_dir(state) * glossy);
-  ray.length = -1.0;
+  ray.length = VERY_FAR;
 }
