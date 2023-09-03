@@ -1,8 +1,8 @@
-// Permuted congruential generator
+// PCG RXS-M-XS 32/32
 // https://www.pcg-random.org
 uint rand_u32(inout uint state) {
-  state = state * 747796405u + 2891336453u;
   uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+  state = state * 747796405u + 2891336453u;
   return (word >> 22u) ^ word;
 }
 
