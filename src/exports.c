@@ -53,7 +53,7 @@ void key_released(char key) {
   input_y = max(input_y, -1);
 }
 
-void game_init(const char* shader) { RayTracerInit(&raytracer, shader); }
+void game_init(void) { RayTracerInit(&raytracer); }
 
 void game_update(float dt) {
   RayTracerUpdate(

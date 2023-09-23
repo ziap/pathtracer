@@ -31,7 +31,7 @@ typedef struct {
   int framebuffer;
 } RayTracer;
 
-extern void RayTracerInit(RayTracer*, const char*);
+extern void RayTracerInit(RayTracer*);
 extern void RayTracerUpdate(
   RayTracer*, int, int, float, float, int, int, float
 );

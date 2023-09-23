@@ -5,9 +5,9 @@
 
 #define PI 3.1415926535897
 
-void RayTracerInit(RayTracer *rb, const char *shader) {
+void RayTracerInit(RayTracer *rb) {
   // TODO: Generate `cast_ray` function from the CPU
-  rb->tracer_program = create_program(shaders_quad_vert, shader);
+  rb->tracer_program = create_program(shaders_quad_vert, shaders_tracer_frag);
   rb->render_program = create_program(shaders_quad_vert, shaders_render_frag);
 
   rb->vao = glCreateVertexArray();
@@ -32,6 +32,7 @@ void RayTracerInit(RayTracer *rb, const char *shader) {
 
   rb->texture1 = glCreateTexture();
   rb->texture2 = glCreateTexture();
+
   rb->framebuffer = glCreateFramebuffer();
 
   glBindTexture(GL_TEXTURE_2D, rb->texture1);
@@ -64,7 +65,7 @@ static void Render(RayTracer *rb, int width, int height) {
 
   // Trace image into a texture
   glBindFramebuffer(GL_FRAMEBUFFER, rb->framebuffer);
-  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, rb->texture2, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rb->texture2, 0);
 
   glBindTexture(GL_TEXTURE_2D, rb->texture1);
   glBindVertexArray(rb->vao);

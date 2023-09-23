@@ -19,7 +19,7 @@ vec3 ACESFilm(vec3 x) {
 out vec4 frag_color;
 
 void main() {
-  vec3 hdr_color = texture2D(u_texture, tex_coord).rgb;
+  vec3 hdr_color = texture(u_texture, tex_coord).rgb;
 
   // TODO: Implement HDR rendering pipeline
   frag_color = vec4(ACESFilm(hdr_color), 1.0);

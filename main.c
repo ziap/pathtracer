@@ -6,7 +6,6 @@
 #include <string.h>
 
 #include "src/exports.h"
-#include "src/resources.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -15,6 +14,10 @@
 
 float fsin(float x) { return sin(x); }
 float fcos(float x) { return cos(x); }
+
+void putf(double x) {
+  printf("%f\n", x);
+}
 
 void resize_callback(GLFWwindow *window, int new_w, int new_h) {
   (void)window;
@@ -92,36 +95,6 @@ void message_callback(
   );
 }
 
-char *generate_shader(void) {
-  const char *shaders[] = {
-    shaders_header_frag,   shaders_random_frag, shaders_ray_frag,
-    shaders_hittable_frag, shaders_tracer_frag,
-  };
-
-  size_t shader_count = sizeof(shaders) / sizeof(shaders[0]);
-
-  size_t *sizes = malloc(sizeof(size_t) * shader_count);
-  size_t total_size = 0;
-
-  for (size_t i = 0; i < shader_count; ++i) {
-    sizes[i] = strlen(shaders[i]);
-    total_size += sizes[i];
-  }
-
-  char *shader = malloc(total_size + 1);
-
-  char *ptr = shader;
-  for (size_t i = 0; i < shader_count; ++i) {
-    memcpy(ptr, shaders[i], sizes[i]);
-    ptr += sizes[i];
-  }
-
-  shader[total_size] = 0;
-  free(sizes);
-
-  return shader;
-}
-
 int main(void) {
   if (!glfwInit()) return -1;
 
@@ -162,9 +135,7 @@ int main(void) {
 
   resize(WIDTH, HEIGHT);
 
-  char *shader = generate_shader();
-  game_init(shader);
-  free(shader);
+  game_init();
 
   while (!glfwWindowShouldClose(window)) {
     game_update(dt);

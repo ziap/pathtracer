@@ -7,6 +7,7 @@
 #define max(a, b) (a > b ? a : b)
 #define min(a, b) (a < b ? a : b)
 
+#define GL_UNSIGNED_BYTE 0x1401
 #define GL_FLOAT 0x1406
 #define GL_TRIANGLES 0x0004
 #define GL_FRAGMENT_SHADER 0x8B30
@@ -27,6 +28,7 @@ typedef enum { false, true } bool;
 #endif
 
 extern int puts(const char*);
+extern int putf(double);
 
 extern int glCreateBuffer(void);
 extern int glCreateFramebuffer(void);
@@ -50,7 +52,7 @@ extern void glBindVertexArray(int);
 extern void glBindTexture(int, int);
 extern void glTexImage2D(int, int, int, int, int, int, int, int, int);
 extern void glTexParameteri(int, int, int);
-extern void glFramebufferTexture(int, int, int, int);
+extern void glFramebufferTexture2D(int, int, int, int, int);
 extern void glUniform3f(int, float, float, float);
 extern void glUniform2f(int, float, float);
 extern void glUniform1ui(int, unsigned int);

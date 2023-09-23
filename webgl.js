@@ -1,6 +1,11 @@
 const canvas = document.querySelector('canvas')
 const gl = canvas.getContext('webgl2')
 
+const ext = gl.getExtension("EXT_color_buffer_float")
+if (!ext) {
+  throw new Error("Floating point texture not supported")
+}
+
 let memory_buffer
 const decoder = new TextDecoder()
 
@@ -20,69 +25,94 @@ const env = {
   fcos(x) { return Math.cos(x) },
   fsin(x) { return Math.sin(x) },
   puts(str) { console.log(cstr(str)) },
+  putf(x) { console.log(x) },
   glCreateBuffer() {
     const buffer = gl.createBuffer()
     gl_objs.push(buffer)
-    return gl_objs.length - 1
+    return gl_objs.length
   },
   glCreateVertexArray() {
     const vao = gl.createVertexArray()
     gl_objs.push(vao)
-    return gl_objs.length - 1
+    return gl_objs.length
   },
   glCreateShader(type) {
     const shader = gl.createShader(type)
     gl_objs.push(shader)
-    return gl_objs.length - 1
+    return gl_objs.length
+  },
+  glCreateTexture() {
+    const tex = gl.createTexture(gl.TEXTURE_2D)
+    gl_objs.push(tex)
+    return gl_objs.length
+  },
+  glCreateFramebuffer() {
+    const fb = gl.createFramebuffer()
+    gl_objs.push(fb)
+    return gl_objs.length
   },
   glCreateProgram() {
     const program = gl.createProgram()
     gl_objs.push(program)
-    return gl_objs.length - 1
+    return gl_objs.length
   },
   glGetUniformLocation(program, name) {
-    const location = gl.getUniformLocation(gl_objs[program], cstr(name))
+    const location = gl.getUniformLocation(gl_objs[program - 1], cstr(name))
     gl_objs.push(location)
-    return gl_objs.length - 1
+    return gl_objs.length
   },
   glViewport(x, y, w, h) {
     gl.viewport(x, y, w, h)
   },
   glSetShaderSource(shader, src) {
-    gl.shaderSource(gl_objs[shader], cstr(src))
+    gl.shaderSource(gl_objs[shader - 1], cstr(src))
   },
   glCompileShader(shader) {
-    gl.compileShader(gl_objs[shader])
+    gl.compileShader(gl_objs[shader - 1])
+    const compilationLog = gl.getShaderInfoLog(gl_objs[shader - 1]);
+    console.log('Shader compiler log: ' + compilationLog);
   },
   glGetShaderParameter(shader, pname) {
-    return gl.getShaderParameter(gl_objs[shader], pname)
+    return gl.getShaderParameter(gl_objs[shader - 1], pname)
   },
   glDeleteShader(shader) {
-    gl.deleteShader(gl_objs[shader])
+    gl.deleteShader(gl_objs[shader - 1])
   },
   glAttachShader(program, shader) {
-    gl.attachShader(gl_objs[program], gl_objs[shader])
+    gl.attachShader(gl_objs[program - 1], gl_objs[shader - 1])
   },
   glLinkProgram(program) {
-    gl.linkProgram(gl_objs[program])
+    gl.linkProgram(gl_objs[program - 1])
   },
   glValidateProgram(program) {
-    gl.validateProgram(gl_objs[program])
+    gl.validateProgram(gl_objs[program - 1])
   },
   glEnable(cap) {
     gl.enable(cap)
   },
   glUseProgram(program) {
-    gl.useProgram(gl_objs[program])
+    gl.useProgram(gl_objs[program - 1])
   },
   glBindBuffer(target, buffer) {
-    gl.bindBuffer(target, gl_objs[buffer])
+    gl.bindBuffer(target, gl_objs[buffer - 1])
   },
   glBindVertexArray(vao) {
-    gl.bindVertexArray(gl_objs[vao])
+    gl.bindVertexArray(gl_objs[vao - 1])
+  },
+  glBindTexture(target, tex) {
+    gl.bindTexture(target, gl_objs[tex - 1])
+  },
+  glBindFramebuffer(target, fb) {
+    gl.bindFramebuffer(target, gl_objs[fb - 1])
   },
   glEnableVertexAttribArray(index) {
     gl.enableVertexAttribArray(index)
+  },
+  glTexParameteri(target, pname, param) {
+    gl.texParameteri(target, pname, param)
+  },
+  glTexImage2D(target, level, internalformat, width, height, border, format, type, data) {
+    gl.texImage2D(target, level, internalformat, width, height, border, format, type, null)
   },
   glBufferData(target, size, data, usage) {
     if (data != 0) {
@@ -91,6 +121,10 @@ const env = {
     } else {
       gl.bufferData(target, size, usage)
     }
+  },
+  glFramebufferTexture2D(target, attachment, textarget, tex, level) {
+    gl.framebufferTexture2D(target, attachment, textarget, gl_objs[tex - 1], level)
+    gl.framebuffer
   },
   glVertexAttribPointer(index, size, type, normalized, stride, offset) {
     gl.vertexAttribPointer(index, size, type, normalized, stride, offset)
@@ -103,16 +137,16 @@ const env = {
     gl.bufferSubData(target, offset, slice)
   },
   glUniform3f(location, x, y, z) {
-    gl.uniform3f(gl_objs[location], x, y, z)
+    gl.uniform3f(gl_objs[location - 1], x, y, z)
   },
   glUniform2f(location, x, y) {
-    gl.uniform2f(gl_objs[location], x, y)
+    gl.uniform2f(gl_objs[location - 1], x, y)
   },
   glUniform1f(location, x) {
-    gl.uniform1f(gl_objs[location], x)
+    gl.uniform1f(gl_objs[location - 1], x)
   },
-  glUniform1i(location, x) {
-    gl.uniform1i(gl_objs[location], x)
+  glUniform1ui(location, x) {
+    gl.uniform1ui(gl_objs[location - 1], x)
   },
   glDrawArrays(mode, first, count) {
     gl.drawArrays(mode, first, count)
